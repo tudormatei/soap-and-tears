@@ -36,6 +36,13 @@ export interface Contract {
   chore_name?: string;
 }
 
+export interface ContractStats {
+  user_name: string;
+  chore_name: string;
+  completion_count: number;
+  last_completed: string;
+}
+
 class Database {
   private usersCollection = collection(db, 'users');
   private choresCollection = collection(db, 'chores');
@@ -243,7 +250,7 @@ class Database {
   }
 
   // Utility methods
-  async getContractStats(): Promise<any[]> {
+  async getContractStats(): Promise<ContractStats[]> {
     const contracts = await this.getAllContracts();
     const statsMap = new Map();
     
