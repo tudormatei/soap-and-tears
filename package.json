@@ -6,15 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build --turbopack",
     "start": "next start",
-    "lint": "eslint",
-    "init-db": "tsx src/lib/init-db.ts"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@types/sqlite3": "^3.1.11",
+    "firebase": "^12.2.1",
     "next": "15.5.3",
     "react": "19.1.0",
-    "react-dom": "19.1.0",
-    "sqlite3": "^5.1.7"
+    "react-dom": "19.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

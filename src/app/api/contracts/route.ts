@@ -12,9 +12,9 @@ export async function GET(request: NextRequest) {
     
     let contracts;
     if (userId) {
-      contracts = await db.getContractsByUser(parseInt(userId));
+      contracts = await db.getContractsByUser(userId);
     } else if (choreId) {
-      contracts = await db.getContractsByChore(parseInt(choreId));
+      contracts = await db.getContractsByChore(choreId);
     } else {
       contracts = await db.getAllContracts();
     }

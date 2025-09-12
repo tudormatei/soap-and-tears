@@ -3,21 +3,21 @@
 import { useState, useEffect } from 'react';
 
 interface User {
-  uid: number;
+  id: string;
   name: string;
 }
 
 interface Chore {
-  cid: number;
+  id: string;
   name: string;
   description: string;
   frequency: string;
 }
 
 interface Contract {
-  contract_id: number;
-  uid: number;
-  cid: number;
+  id: string;
+  uid: string;
+  cid: string;
   completed_date: string;
   user_name?: string;
   chore_name?: string;
@@ -28,7 +28,7 @@ export default function Home() {
   const [chores, setChores] = useState<Chore[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedChore, setSelectedChore] = useState<number | null>(null);
+  const [selectedChore, setSelectedChore] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
@@ -57,11 +57,11 @@ export default function Home() {
     }
   };
 
-  const handleChoreClick = (choreId: number) => {
+  const handleChoreClick = (choreId: string) => {
     setSelectedChore(selectedChore === choreId ? null : choreId);
   };
 
-  const handleUserSelect = async (userId: number) => {
+  const handleUserSelect = async (userId: string) => {
     if (!selectedChore) return;
     
     setIsSubmitting(true);
@@ -138,11 +138,11 @@ export default function Home() {
             </h2>
             <div className="space-y-3">
               {chores.map((chore) => (
-                <div key={chore.cid} className="relative">
+                <div key={chore.id} className="relative">
                   <div
-                    onClick={() => handleChoreClick(chore.cid)}
+                    onClick={() => handleChoreClick(chore.id)}
                     className={`p-4 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:shadow-md ${
-                      selectedChore === chore.cid
+                      selectedChore === chore.id
                         ? 'border-indigo-500 bg-indigo-50'
                         : 'border-gray-200 bg-gray-50 hover:border-gray-300'
                     }`}
@@ -163,7 +163,7 @@ export default function Home() {
                   </div>
 
                   {/* User Selection Dropdown */}
-                  {selectedChore === chore.cid && (
+                  {selectedChore === chore.id && (
                     <div className="mt-3 p-4 bg-indigo-50 rounded-lg border border-indigo-200">
                       <p className="text-sm text-indigo-800 mb-3 font-medium">
                         Who completed this chore?
@@ -171,8 +171,8 @@ export default function Home() {
                       <div className="flex flex-wrap gap-2">
                         {users.map((user) => (
                           <button
-                            key={user.uid}
-                            onClick={() => handleUserSelect(user.uid)}
+                            key={user.id}
+                            onClick={() => handleUserSelect(user.id)}
                             disabled={isSubmitting}
                             className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 text-sm font-medium"
                           >
@@ -206,7 +206,7 @@ export default function Home() {
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {contracts.map((contract) => (
                   <div
-                    key={contract.contract_id}
+                    key={contract.id}
                     className="p-4 bg-green-50 rounded-lg border border-green-200 hover:bg-green-100 transition-colors duration-200"
                   >
                     <div className="flex justify-between items-start">
