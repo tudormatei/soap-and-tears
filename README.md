@@ -2,6 +2,8 @@
 
 Keep a shared home clean without the drama. Soap & Tears is a simple web app and API for organizing, tracking, and visualizing household chores for roommates and dorms.
 
+[![Soap & Tears UI](docs/ui.png)](docs/ui.png)
+
 ### Why this exists
 
 Keeping a shared living space clean is hard: people forget, expectations differ, and no one wants to nag. Soap & Tears makes chores explicit, fair, and visible with lightweight tracking and stats. It focuses on clarity over complexity so small groups can get started in minutes.
