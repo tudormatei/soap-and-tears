@@ -48,7 +48,7 @@ Relationships are resolved at read time; stats are computed from completion hist
 1. Clone and install dependencies
 
 ```bash
-git clone <your-repo-url> soap-and-tears
+git clone https://github.com/tudormatei/soap-and-tears.git
 cd soap-and-tears
 npm install
 ```
