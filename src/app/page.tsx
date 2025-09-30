@@ -28,7 +28,7 @@ interface GroceryItem {
   name: string;
   completed: boolean;
   added_by?: string;
-  created_at: any;
+  created_at: string | { seconds: number; nanoseconds: number };
 }
 
 export default function Home() {
