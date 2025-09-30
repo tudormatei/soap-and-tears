@@ -23,13 +23,23 @@ interface Contract {
   chore_name?: string;
 }
 
+interface GroceryItem {
+  id: string;
+  name: string;
+  completed: boolean;
+  added_by?: string;
+  created_at: any;
+}
+
 export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [chores, setChores] = useState<Chore[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [groceries, setGroceries] = useState<GroceryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedChore, setSelectedChore] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [newGroceryItem, setNewGroceryItem] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -37,19 +47,22 @@ export default function Home() {
 
   const fetchData = async () => {
     try {
-      const [usersRes, choresRes, contractsRes] = await Promise.all([
+      const [usersRes, choresRes, contractsRes, groceriesRes] = await Promise.all([
         fetch('/api/users'),
         fetch('/api/chores'),
-        fetch('/api/contracts')
+        fetch('/api/contracts'),
+        fetch('/api/groceries')
       ]);
 
       const usersData = await usersRes.json();
       const choresData = await choresRes.json();
       const contractsData = await contractsRes.json();
+      const groceriesData = await groceriesRes.json();
 
       setUsers(usersData.users);
       setChores(choresData.chores);
       setContracts(contractsData.contracts);
+      setGroceries(groceriesData.groceries);
     } catch (error) {
       console.error('Error fetching data:', error);
     } finally {
@@ -91,6 +104,52 @@ export default function Home() {
       console.error('Error creating contract:', error);
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleAddGroceryItem = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newGroceryItem.trim()) return;
+
+    try {
+      const response = await fetch('/api/groceries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: newGroceryItem,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchData();
+        setNewGroceryItem('');
+      } else {
+        console.error('Failed to add grocery item');
+      }
+    } catch (error) {
+      console.error('Error adding grocery item:', error);
+    }
+  };
+
+  const handleDeleteGroceryItem = async (id: string) => {
+    try {
+      const response = await fetch('/api/groceries', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (response.ok) {
+        await fetchData();
+      } else {
+        console.error('Failed to delete grocery item');
+      }
+    } catch (error) {
+      console.error('Error deleting grocery item:', error);
     }
   };
 
@@ -243,9 +302,65 @@ export default function Home() {
           </div>
         </div>
 
+        {/* Grocery List Section */}
+        <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
+          <h2 className="text-2xl font-semibold mb-6 text-gray-800 flex items-center">
+            <span className="mr-2">🛒</span>
+            Grocery List
+          </h2>
+          
+          {/* Add New Item Form */}
+          <form onSubmit={handleAddGroceryItem} className="mb-6">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={newGroceryItem}
+                onChange={(e) => setNewGroceryItem(e.target.value)}
+                placeholder="Add a grocery item..."
+                className="flex-1 px-4 py-3 border-2 border-gray-300 rounded-lg focus:outline-none focus:border-indigo-500 transition-colors"
+              />
+              <button
+                type="submit"
+                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200 font-medium"
+              >
+                Add
+              </button>
+            </div>
+          </form>
+
+          {/* Grocery Items List */}
+          {groceries.length === 0 ? (
+            <div className="text-center py-8">
+              <div className="text-4xl mb-3">🍎</div>
+              <p className="text-gray-500">No items on the grocery list</p>
+              <p className="text-gray-400 text-sm mt-1">Add items above to get started!</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {groceries.map((item) => (
+                <div
+                  key={item.id}
+                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200 hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center gap-3 flex-1">
+                    <span className="text-lg">📦</span>
+                    <span className="text-gray-900 font-medium">{item.name}</span>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteGroceryItem(item.id)}
+                    className="px-4 py-2 text-sm bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors duration-200"
+                  >
+                    ✓ Got it
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Stats Footer */}
         <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
             <div className="p-4 bg-blue-50 rounded-lg">
               <div className="text-2xl font-bold text-blue-600">{users.length}</div>
               <div className="text-sm text-blue-800">Team Members</div>
@@ -257,6 +372,10 @@ export default function Home() {
             <div className="p-4 bg-purple-50 rounded-lg">
               <div className="text-2xl font-bold text-purple-600">{contracts.length}</div>
               <div className="text-sm text-purple-800">Completions</div>
+            </div>
+            <div className="p-4 bg-orange-50 rounded-lg">
+              <div className="text-2xl font-bold text-orange-600">{groceries.length}</div>
+              <div className="text-sm text-orange-800">Grocery Items</div>
             </div>
           </div>
         </div>

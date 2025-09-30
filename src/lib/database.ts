@@ -43,10 +43,19 @@ export interface ContractStats {
   last_completed: string;
 }
 
+export interface GroceryItem {
+  id: string;
+  name: string;
+  completed: boolean;
+  added_by?: string;
+  created_at: Timestamp;
+}
+
 class Database {
   private usersCollection = collection(db, 'users');
   private choresCollection = collection(db, 'chores');
   private contractsCollection = collection(db, 'contracts');
+  private groceriesCollection = collection(db, 'groceries');
 
   async initialize(): Promise<void> {
     try {
@@ -306,6 +315,45 @@ class Database {
     await this.clearAllData();
     await this.initializeSampleData();
     console.log('Database reset complete');
+  }
+
+  // Grocery operations
+  async getAllGroceries(): Promise<GroceryItem[]> {
+    const snapshot = await getDocs(query(this.groceriesCollection, orderBy('created_at', 'desc')));
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    } as GroceryItem));
+  }
+
+  async createGroceryItem(name: string, addedBy?: string): Promise<string> {
+    const docRef = await addDoc(this.groceriesCollection, {
+      name,
+      completed: false,
+      added_by: addedBy || '',
+      created_at: serverTimestamp()
+    });
+    return docRef.id;
+  }
+
+  async toggleGroceryItem(id: string, completed: boolean): Promise<void> {
+    const docRef = doc(this.groceriesCollection, id);
+    const docSnap = await getDoc(docRef);
+    if (!docSnap.exists()) {
+      throw new Error('Grocery item not found');
+    }
+    await deleteDoc(docRef);
+    if (!completed) {
+      // If marking as completed (deleting from active list)
+      // We just delete it - no need to keep completed items
+      return;
+    }
+    // If uncompleting (which won't happen in our UI), we'd recreate it
+  }
+
+  async deleteGroceryItem(id: string): Promise<void> {
+    const docRef = doc(this.groceriesCollection, id);
+    await deleteDoc(docRef);
   }
 }
 
