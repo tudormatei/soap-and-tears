@@ -3,16 +3,26 @@ import { getDatabase } from '@/lib/database';
 
 export async function GET() {
   try {
+    console.log('API: Starting users fetch...');
     const db = getDatabase();
+    console.log('API: Database instance created');
+    
     await db.initialize();
+    console.log('API: Database initialized');
     
     const users = await db.getAllUsers();
+    console.log('API: Users fetched:', users.length);
     
     return NextResponse.json({ users });
   } catch (error) {
-    console.error('Error fetching users:', error);
+    console.error('API: Error fetching users:', error);
+    console.error('API: Error details:', {
+      message: error.message,
+      code: error.code,
+      stack: error.stack
+    });
     return NextResponse.json(
-      { error: 'Failed to fetch users' },
+      { error: 'Failed to fetch users', details: error.message },
       { status: 500 }
     );
   }
