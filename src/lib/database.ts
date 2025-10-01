@@ -59,32 +59,14 @@ class Database {
 
   async initialize(): Promise<void> {
     try {
-      console.log('Starting database initialization...');
-      console.log('Firebase config check:', {
-        apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? 'Set' : 'Missing',
-        projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID ? 'Set' : 'Missing',
-        authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN ? 'Set' : 'Missing'
-      });
-      
       // Check if data exists, if not initialize with sample data
-      console.log('Attempting to fetch users...');
       const usersSnapshot = await getDocs(this.usersCollection);
-      console.log(`Found ${usersSnapshot.size} users in database`);
       
       if (usersSnapshot.empty) {
-        console.log('Initializing sample data...');
         await this.initializeSampleData();
-        console.log('Sample data initialization complete');
-      } else {
-        console.log('Database already has data, skipping initialization');
       }
     } catch (error) {
       console.error('Error during database initialization:', error);
-      console.error('Error details:', {
-        message: error instanceof Error ? error.message : 'Unknown error',
-        code: (error as { code?: string })?.code || 'unknown',
-        stack: error instanceof Error ? error.stack : 'No stack trace'
-      });
       throw error;
     }
   }
