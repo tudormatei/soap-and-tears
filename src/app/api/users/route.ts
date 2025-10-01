@@ -17,12 +17,12 @@ export async function GET() {
   } catch (error) {
     console.error('API: Error fetching users:', error);
     console.error('API: Error details:', {
-      message: error.message,
-      code: error.code,
-      stack: error.stack
+      message: error instanceof Error ? error.message : 'Unknown error',
+      code: (error as any)?.code || 'unknown',
+      stack: error instanceof Error ? error.stack : 'No stack trace'
     });
     return NextResponse.json(
-      { error: 'Failed to fetch users', details: error.message },
+      { error: 'Failed to fetch users', details: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     );
   }

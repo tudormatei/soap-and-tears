@@ -81,9 +81,9 @@ class Database {
     } catch (error) {
       console.error('Error during database initialization:', error);
       console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        stack: error.stack
+        message: error instanceof Error ? error.message : 'Unknown error',
+        code: (error as any)?.code || 'unknown',
+        stack: error instanceof Error ? error.stack : 'No stack trace'
       });
       throw error;
     }
